@@ -1,12 +1,19 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import PhotoImage
+from tkinter import ttk, PhotoImage
+import os
 import serial
 import serial.tools.list_ports
 import threading
 import time
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# Definir la ruta a la carpeta 'imagenes'
+ruta_Imagenes = os.path.join(os.path.dirname(__file__), 'imagenes')
+
+# Definir las rutas a las imágenes
+ruta_fondo_main = os.path.join(ruta_Imagenes, 'FondoMain.png')
+ruta_imagen = os.path.join(ruta_Imagenes, 'Main.png')
 
 # Variables globales para almacenar datos
 tiempos = []
@@ -18,6 +25,7 @@ canvas = [None] * 3
 ax = [None] * 3
 fig = [None] * 3
 
+#=============================Lectura de puertos COM====================================================#
 def obtener_puertos_com():
     """Obtiene una lista de puertos COM disponibles."""
     puertos = serial.tools.list_ports.comports()
@@ -26,6 +34,7 @@ def obtener_puertos_com():
         lista_puertos = ["No se encontraron puertos COM"]
     return lista_puertos
 
+#=======================================Actualizar si se Desconecta======================================#
 def actualizar_puertos():
     """Actualiza la lista de puertos COM en el Combobox."""
     puertos_disponibles = obtener_puertos_com()
@@ -36,10 +45,11 @@ def actualizar_puertos():
     # Volver a ejecutar la función después de 500 ms 
     root.after(500, actualizar_puertos)
 
+#======================================Lee Datos en el Puerto COM==========================================#
 def leer_datos_com(puerto_com, velocidad_baudios):
     """Lee datos del puerto COM en un hilo separado."""
     try:
-        with serial.Serial(puerto_com, velocidad_baudios, timeout=1) as ser:
+        with serial.Serial(puerto_com, velocidad_baudios, timeout=1) as ser: # "timeout=1" reset cada 1 segundo
             while True:
                 if ser.in_waiting > 0:
                     datos = ser.readline().decode('utf-8').strip()
@@ -133,9 +143,12 @@ def mostrar_nueva_interfaz():
     nueva_ventana.geometry(f"{pantalla_ancho}x{pantalla_alto}")
 
     # Crear un Label para la imagen de fondo
-    fondo_imagen = PhotoImage(file=r"c:\Users\SJG\Desktop\Proyecto Cansat\FondoMainGraficas.png")  # Cambia esto por la ruta de tu imagen
-    fondo_label = tk.Label(nueva_ventana, image=fondo_imagen)
-    fondo_label.place(relwidth=1, relheight=1)
+    try:
+        fondo_imagen = PhotoImage(file=ruta_fondo_main)
+        fondo_label = tk.Label(nueva_ventana, image=fondo_imagen)
+        fondo_label.place(relwidth=1, relheight=1)
+    except Exception as e:
+        print(f"Error al cargar la imagen de fondo: {e}")
 
     # Crear un contenedor para centrar los cuadros
     contenedor = tk.Frame(nueva_ventana, bg='white')
@@ -151,12 +164,12 @@ def mostrar_nueva_interfaz():
         canvas_widget.grid(row=0, column=i, padx=5, pady=5)
 
     # Crear un marco para el botón de cerrar
-    #marco_boton = tk.Frame(nueva_ventana, bg='blue')
-    #marco_boton.pack(side='bottom', anchor='w', padx=20, pady=20)
+    marco_boton = tk.Frame(nueva_ventana, bg='blue')
+    marco_boton.pack(side='bottom', anchor='w', padx=20, pady=20)
 
     # Botón para cerrar la nueva ventana
-    #cerrar_boton = tk.Button(marco_boton, text="Cerrar", command=nueva_ventana.destroy)
-    #cerrar_boton.pack()
+    cerrar_boton = tk.Button(marco_boton, text="Cerrar", command=nueva_ventana.destroy)
+    cerrar_boton.pack()
 
     # Ajustar la cuadrícula del contenedor para que mantenga el tamaño y posición de los gráficos
     contenedor.update_idletasks()
@@ -184,25 +197,24 @@ pantalla_alto = root.winfo_screenheight()
 root.geometry(f"{pantalla_ancho}x{pantalla_alto}")
 
 # Crear un Label para la imagen de fondo
-fondo_imagen = PhotoImage(file=r"c:\Users\SJG\Desktop\Proyecto Cansat\Fondo Main.png")  # Cambia esto por la ruta de tu imagen
-fondo_label = tk.Label(root, image=fondo_imagen)
-fondo_label.place(relwidth=1, relheight=1)
-
-# Crear un Label para la imagen de fondo del marco de selección
-fondo_imagen_frame = PhotoImage(file=r"c:\Users\SJG\Desktop\Proyecto Cansat\Fondo Main.png")  # Cambia esto por la ruta de tu imagen
+try:
+    fondo_imagen = PhotoImage(file=ruta_fondo_main)
+    fondo_label = tk.Label(root, image=fondo_imagen)
+    fondo_label.place(relwidth=1, relheight=1)
+except Exception as e:
+    print(f"Error al cargar la imagen de fondo: {e}")
 
 # Crear un marco para contener la imagen y el selector
 marco_contenedor = tk.Frame(root, bg='#04111d')
 marco_contenedor.place(relx=0.5, rely=0.40, anchor='center')
 
-# Colocar el Label de imagen de fondo en el marco del contenedor
-fondo_label_frame = tk.Label(marco_contenedor, image=fondo_imagen_frame, bg='white')
-fondo_label_frame.place(relwidth=1, relheight=1)
-
 # Cargar y mostrar la imagen
-imagen = tk.PhotoImage(file=r"c:\Users\SJG\Desktop\Proyecto Cansat\Main.png")  # Cambia esto por la ruta de tu imagen
-label_imagen = tk.Label(marco_contenedor, image=imagen, bg='#153553')
-label_imagen.pack(pady=5)
+try:
+    imagen = PhotoImage(file=ruta_imagen)
+    label_imagen = tk.Label(marco_contenedor, image=imagen, bg='#153553')
+    label_imagen.pack(pady=5)
+except Exception as e:
+    print(f"Error al cargar la imagen principal: {e}")
 
 # Crear un marco para el texto, el selector y el botón OK
 marco_selector = tk.Frame(marco_contenedor, bg='#153553')
