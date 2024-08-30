@@ -1,0 +1,54 @@
+import json
+import time
+import random
+import os
+
+def generate_data():
+    """Genera datos de temperatura, presión y altitud."""
+    temperature = round(random.uniform(10, 30), 2)
+    pressure = round(random.uniform(980, 1030), 2)
+    altitude = round(random.uniform(0, 1000), 2)
+    return {"temperature": temperature, "pressure": pressure, "altitude": altitude}
+
+def load_existing_data(filename="sensor_data.json"):
+    """Carga los datos existentes del archivo JSON."""
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    print("Formato de datos incorrecto en el archivo. Se creará un nuevo archivo.")
+                    return []
+                return data
+            except json.JSONDecodeError:
+                print("Error al decodificar el archivo JSON.")
+                return []
+    return []
+
+def save_data_to_file(data, filename="sensor_data.json"):
+    """Guarda los datos en un archivo JSON."""
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def trim_data(data, max_size=100):
+    """Mantiene solo los últimos `max_size` datos."""
+    return data[-max_size:]
+
+if __name__ == "__main__":
+    filename = "sensor_data.json"
+    max_data_points = 100  # Número máximo de puntos de datos a mantener
+
+    while True:
+        new_data = generate_data()
+        print(f"Datos en tiempo real: {new_data}")
+
+        # Cargar datos existentes
+        data_list = load_existing_data(filename)
+        # Añadir los nuevos datos
+        data_list.append(new_data)
+        # Mantener solo los datos más recientes
+        data_list = trim_data(data_list, max_size=max_data_points)
+        # Guardar los datos actualizados en el archivo
+        save_data_to_file(data_list, filename)
+
+        time.sleep(1)  # Espera 1 segundo antes de generar nuevos datos
