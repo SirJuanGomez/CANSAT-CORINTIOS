@@ -176,13 +176,18 @@ ani = animation.FuncAnimation(fig, update, init_func=init, blit=True, interval=1
 canvas = FigureCanvasTkAgg(fig, master=graph_frame)
 canvas.get_tk_widget().pack(fill=BOTH, expand=1)
 
-# Función para ocultar la ventana principal y actualizar el archivo de estado
+# Función para ocultar la ventana principal, actualizar el archivo de estado y luego cerrar la aplicación
 def close_app():
+    root.deiconify()  # Mostrar la ventana anterior
+    root.update_idletasks()  # Forzar actualización de la interfaz gráfica
+    root.withdraw()  # Ocultar la ventana actual
+    
     # Actualizar el archivo de estado a 0
     with open(status_file, 'w') as f:
         f.write('0')
-    # Ocultar la ventana principal
-    root.withdraw()
+    
+    # Salir de la aplicación después de actualizar el estado
+    root.quit()
 
 # Crear el botón de cerrar y colocarlo en la parte inferior izquierda
 close_button = ttk.Button(main_frame, text="Cerrar", command=close_app)

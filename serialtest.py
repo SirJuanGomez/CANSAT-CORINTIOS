@@ -1,17 +1,12 @@
 import serial
 import json
 import os
-from datetime import datetime
-import time
 
 # Nombre del archivo de estado
 status_file = 'status.txt'
 
 # Nombre del archivo JSON
 json_filename = 'sensor_data.json'
-
-# Número máximo de entradas en el archivo JSON
-MAX_ENTRIES = 20
 
 def read_status():
     """Lee el valor del archivo de estado y devuelve el valor entero."""
@@ -23,27 +18,14 @@ def read_status():
                 return 0
     return 0
 
-def load_data():
-    """Carga datos existentes del archivo JSON."""
-    if os.path.exists(json_filename):
-        with open(json_filename, 'r') as file:
-            try:
-                return json.load(file)
-            except json.JSONDecodeError:
-                return []
-    return []
-
-def save_data(data_list):
-    """Guarda datos en el archivo JSON."""
+def save_data(data):
+    """Guarda datos en el archivo JSON, reemplazando cualquier contenido existente."""
     with open(json_filename, 'w') as file:
-        json.dump(data_list, file, indent=4)
+        json.dump(data, file, indent=4)
 
 def main():
     # Configura el puerto serial
     ser = serial.Serial('COM4', 115200, timeout=1)  # Cambia 'COM4' al puerto serial correcto
-    
-    # Inicializar la lista de datos
-    data_list = load_data()
     
     while True:
         if read_status() == 1:
@@ -57,24 +39,13 @@ def main():
                         print("Datos recibidos:")
                         print(data)
                         
-                        # Agregar los datos a la lista
-                        data_list.append(data)
-                        
-                        # Comprobar si la lista alcanza el máximo de entradas
-                        if len(data_list) > MAX_ENTRIES:
-                            # Mantener solo las últimas MAX_ENTRIES entradas
-                            data_list = data_list[-MAX_ENTRIES:]
-                        
-                        # Guardar la lista actualizada en el archivo JSON
-                        save_data(data_list)
+                        # Guardar solo los datos nuevos, reemplazando los existentes en el archivo JSON
+                        save_data([data])
                         
                     except json.JSONDecodeError:
                         print("Error al decodificar JSON:", line)
                 
             except KeyboardInterrupt:
-                # Guardar los datos restantes al finalizar
-                if data_list:
-                    save_data(data_list)
                 print("Programa interrumpido por el usuario.")
                 break
             except Exception as e:
