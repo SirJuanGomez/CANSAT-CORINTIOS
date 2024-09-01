@@ -1,16 +1,16 @@
 [
     {
-        "timestamp": 229,
-        "temperature": 30.4,
-        "pressure": 902.76,
-        "altitude": 963.44,
-        "ax": 4536,
-        "ay": -13508,
-        "az": -9520,
-        "gx": -163,
-        "gy": 47,
-        "gz": -57,
-        "uvValue": 1021,
+        "timestamp": 13,
+        "temperature": 30.67,
+        "pressure": 901.68,
+        "altitude": 973.29,
+        "ax": 1972,
+        "ay": -13952,
+        "az": -9496,
+        "gx": -106,
+        "gy": 238,
+        "gz": 241,
+        "uvValue": 1022,
         "uvVoltage": 0.82
     }
 ]

@@ -6,7 +6,6 @@ from collections import deque
 from tkinter import *
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import sys
 
 # Nombre del archivo JSON y el archivo de estado
 json_filename = 'sensor_data.json'
@@ -188,6 +187,13 @@ def close_app():
     
     # Salir de la aplicación después de actualizar el estado
     root.quit()
+
+# Sobrescribir el manejador de cierre de la ventana para evitar el cierre desde la 'X'
+def on_closing():
+    # Llamar a la función close_app al intentar cerrar la ventana
+    close_app()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Crear el botón de cerrar y colocarlo en la parte inferior izquierda
 close_button = ttk.Button(main_frame, text="Cerrar", command=close_app)
