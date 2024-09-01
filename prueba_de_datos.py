@@ -1,83 +1,109 @@
 import json
-import tkinter as tk
-from tkinter import ttk
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.animation as animation
+import os
+from collections import deque
 
-def read_json_data(filename="sensor_data.json"):
-    """Lee los datos de un archivo JSON."""
-    try:
-        with open(filename, 'r') as f:
-            data = json.load(f)
-        if not isinstance(data, list):
-            print("El formato de datos es incorrecto, se esperaba una lista.")
-            return None
-        return data
-    except FileNotFoundError:
-        print(f"El archivo {filename} no se encontró.")
-        return None
-    except json.JSONDecodeError:
-        print("Error al decodificar el archivo JSON.")
-        return None
+# Nombre del archivo JSON
+json_filename = 'sensor_data.json'
 
-def plot_data(data):
-    """Genera gráficos para cada variable."""
-    if not isinstance(data, list) or not all(isinstance(d, dict) for d in data):
-        print("Formato de datos incorrecto.")
-        return None
+# Configuración de la gráfica
+fig, axs = plt.subplots(2, 1, figsize=(12, 10))
+ax1 = axs[0]
+ax2 = axs[1]
 
-    temperature = [d["temperature"] for d in data]
-    pressure = [d["pressure"] for d in data]
-    altitude = [d["altitude"] for d in data]
+# Configuración de las listas de datos
+max_len = 100  # Número máximo de puntos en la gráfica
+temperature_data = deque(maxlen=max_len)
+pressure_data = deque(maxlen=max_len)
+timestamps = deque(maxlen=max_len)
 
-    fig, axs = plt.subplots(3, 1, figsize=(8, 6))
-    axs[0].plot(temperature)
-    axs[0].set_title("Temperatura")
-    axs[1].plot(pressure)
-    axs[1].set_title("Presión")
-    axs[2].plot(altitude)
-    axs[2].set_title("Altitud")
+# Configuración de la gráfica de temperatura
+line_temp, = ax1.plot([], [], marker='o', linestyle='-', color='b', label='Temperatura (°C)')
+ax1.set_xlabel('Tiempo (s)')
+ax1.set_ylabel('Temperatura (°C)')
+ax1.set_title('Temperatura en Tiempo Real')
+ax1.grid(True)
+ax1.legend()
 
-    plt.tight_layout()
-    return fig
+# Configuración de la gráfica de presión
+line_pres, = ax2.plot([], [], marker='o', linestyle='-', color='r', label='Presión (hPa)')
+ax2.set_xlabel('Tiempo (s)')
+ax2.set_ylabel('Presión (hPa)')
+ax2.set_title('Presión en Tiempo Real')
+ax2.grid(True)
+ax2.legend()
 
-def update_plot():
-    """Actualiza la gráfica con los datos del archivo JSON."""
-    data = read_json_data()
-    print("Datos leídos:", data)  # Añadido para depuración
-    if data:
-        fig = plot_data(data)
-        if fig:
-            # Borra el widget anterior si existe
-            for widget in canvas_frame.winfo_children():
-                widget.destroy()
-            # Crea un nuevo widget de lienzo y lo coloca en el marco
-            global canvas
-            canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
-            canvas_widget = canvas.get_tk_widget()
-            canvas_widget.grid(row=0, column=0, sticky="nsew")
-            canvas.draw()
-    # Programa la próxima actualización
-    root.after(1000, update_plot)  # Actualizar cada 5000 milisegundos (5 segundos)
+# Datos actuales del giroscopio y UV
+text_box = ax2.text(0.1, 0.9, '', transform=ax2.transAxes, fontsize=12, verticalalignment='top')
+ax2.axis('off')  # Desactiva los ejes para que solo se muestre el texto
 
-# Crear la ventana principal
-root = tk.Tk()
-root.title("Visualización de Datos")
+# Leer los datos del archivo JSON
+def load_data(filename):
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            try:
+                data = json.load(file)
+                # Si los datos no están en una lista, los convertimos en una lista
+                if isinstance(data, dict):
+                    return [data]
+                return data
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                print(f"Error al leer el archivo JSON: {e}")
+                return []
+    return []
 
-# Crear un marco para contener la gráfica
-canvas_frame = ttk.Frame(root)
-canvas_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
+# Función de inicialización para el gráfico
+def init():
+    line_temp.set_data([], [])
+    line_pres.set_data([], [])
+    text_box.set_text('')
+    return line_temp, line_pres, text_box
 
-# Botón para iniciar la actualización automática (opcional)
-start_button = ttk.Button(root, text="Iniciar Actualización Automática", command=lambda: update_plot())
-start_button.grid(row=0, column=0, padx=10, pady=10)
+# Función de actualización para la animación
+def update(frame):
+    data_list = load_data(json_filename)
 
-# Iniciar la actualización automática al iniciar
-root.after(5000, update_plot)  # Actualizar cada 5000 milisegundos (5 segundos)
+    if not data_list:
+        return line_temp, line_pres, text_box
 
-# Ajustar el tamaño del marco
-root.grid_columnconfigure(0, weight=1)
-root.grid_rowconfigure(1, weight=1)
+    # Extraer timestamps, temperaturas y presiones
+    global timestamps, temperature_data, pressure_data
 
-# Iniciar la aplicación
-root.mainloop()
+    timestamps.append(data_list[-1]['timestamp'])
+    temperature_data.append(data_list[-1]['temperature'])
+    pressure_data.append(data_list[-1]['pressure'])
+    
+    # Datos actuales del giroscopio y UV
+    latest_data = data_list[-1]
+    gx = latest_data['gx']
+    gy = latest_data['gy']
+    gz = latest_data['gz']
+    uv_voltage = latest_data['uvVoltage']
+
+    # Actualizar gráficos
+    line_temp.set_data(timestamps, temperature_data)
+    line_pres.set_data(timestamps, pressure_data)
+    
+    # Ajustar los límites de los ejes
+    ax1.set_xlim(min(timestamps), max(timestamps))
+    ax1.set_ylim(0, 150)  # Ajustar el límite superior para la temperatura
+
+    ax2.set_xlim(min(timestamps), max(timestamps))
+    ax2.set_ylim(min(pressure_data) - 10, max(pressure_data) + 10)
+    
+    # Actualizar recuadro de valores
+    text_box.set_text(
+        f'Giroscopio X: {gx}\n'
+        f'Giroscopio Y: {gy}\n'
+        f'Giroscopio Z: {gz}\n'
+        f'Voltaje UV: {uv_voltage:.2f} V'
+    )
+    
+    return line_temp, line_pres, text_box
+
+# Crear la animación
+ani = animation.FuncAnimation(fig, update, init_func=init, blit=True, interval=1000)  # Intervalo en milisegundos
+
+plt.tight_layout()
+plt.show()

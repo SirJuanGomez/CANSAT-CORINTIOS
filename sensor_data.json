@@ -1,502 +1,282 @@
 [
     {
-        "temperature": 27.06,
-        "pressure": 988.74,
-        "altitude": 557.47
-    },
-    {
-        "temperature": 26.61,
-        "pressure": 983.85,
-        "altitude": 995.26
-    },
-    {
-        "temperature": 19.08,
-        "pressure": 1023.35,
-        "altitude": 933.74
-    },
-    {
-        "temperature": 22.38,
-        "pressure": 994.67,
-        "altitude": 631.62
-    },
-    {
-        "temperature": 29.34,
-        "pressure": 982.74,
-        "altitude": 134.18
-    },
-    {
-        "temperature": 13.58,
-        "pressure": 991.35,
-        "altitude": 367.62
-    },
-    {
-        "temperature": 24.54,
-        "pressure": 981.7,
-        "altitude": 829.68
-    },
-    {
-        "temperature": 25.88,
-        "pressure": 1004.83,
-        "altitude": 557.67
-    },
-    {
-        "temperature": 22.43,
-        "pressure": 989.51,
-        "altitude": 839.91
-    },
-    {
-        "temperature": 20.7,
-        "pressure": 1012.21,
-        "altitude": 970.11
-    },
-    {
-        "temperature": 25.7,
-        "pressure": 1017.55,
-        "altitude": 914.91
-    },
-    {
-        "temperature": 18.16,
-        "pressure": 1027.04,
-        "altitude": 424.41
-    },
-    {
-        "temperature": 28.94,
-        "pressure": 1014.66,
-        "altitude": 456.31
-    },
-    {
-        "temperature": 17.94,
-        "pressure": 988.51,
-        "altitude": 8.18
-    },
-    {
-        "temperature": 25.93,
-        "pressure": 987.1,
-        "altitude": 191.64
-    },
-    {
-        "temperature": 27.98,
-        "pressure": 1009.92,
-        "altitude": 105.91
-    },
-    {
-        "temperature": 26.26,
-        "pressure": 1007.05,
-        "altitude": 464.06
-    },
-    {
-        "temperature": 19.88,
-        "pressure": 1006.93,
-        "altitude": 338.49
-    },
-    {
-        "temperature": 18.19,
-        "pressure": 993.54,
-        "altitude": 416.35
-    },
-    {
-        "temperature": 14.91,
-        "pressure": 1017.83,
-        "altitude": 325.9
-    },
-    {
-        "temperature": 21.13,
-        "pressure": 991.32,
-        "altitude": 774.4
-    },
-    {
-        "temperature": 29.21,
-        "pressure": 1019.28,
-        "altitude": 127.19
-    },
-    {
-        "temperature": 26.63,
-        "pressure": 1017.78,
-        "altitude": 885.57
-    },
-    {
-        "temperature": 13.97,
-        "pressure": 1019.59,
-        "altitude": 593.49
-    },
-    {
-        "temperature": 22.66,
-        "pressure": 1007.35,
-        "altitude": 591.84
-    },
-    {
-        "temperature": 19.51,
-        "pressure": 1017.87,
-        "altitude": 204.46
-    },
-    {
-        "temperature": 25.2,
-        "pressure": 982.26,
-        "altitude": 668.81
-    },
-    {
-        "temperature": 20.64,
-        "pressure": 1005.86,
-        "altitude": 643.09
-    },
-    {
-        "temperature": 16.33,
-        "pressure": 1014.4,
-        "altitude": 901.73
-    },
-    {
-        "temperature": 28.32,
-        "pressure": 1014.09,
-        "altitude": 574.82
-    },
-    {
-        "temperature": 26.88,
-        "pressure": 982.53,
-        "altitude": 789.21
-    },
-    {
-        "temperature": 11.35,
-        "pressure": 1000.63,
-        "altitude": 422.59
-    },
-    {
-        "temperature": 14.6,
-        "pressure": 1023.65,
-        "altitude": 544.45
-    },
-    {
-        "temperature": 16.07,
-        "pressure": 1011.08,
-        "altitude": 729.12
-    },
-    {
-        "temperature": 22.83,
-        "pressure": 1026.75,
-        "altitude": 567.39
-    },
-    {
-        "temperature": 15.68,
-        "pressure": 1005.18,
-        "altitude": 790.72
-    },
-    {
-        "temperature": 10.72,
-        "pressure": 1016.21,
-        "altitude": 790.76
-    },
-    {
-        "temperature": 15.46,
-        "pressure": 1022.7,
-        "altitude": 567.38
-    },
-    {
-        "temperature": 14.67,
-        "pressure": 1004.8,
-        "altitude": 492.11
-    },
-    {
-        "temperature": 13.42,
-        "pressure": 1010.19,
-        "altitude": 918.32
-    },
-    {
-        "temperature": 23.53,
-        "pressure": 1015.84,
-        "altitude": 412.96
-    },
-    {
-        "temperature": 29.0,
-        "pressure": 1025.27,
-        "altitude": 291.73
-    },
-    {
-        "temperature": 11.76,
-        "pressure": 1003.01,
-        "altitude": 811.29
-    },
-    {
-        "temperature": 15.9,
-        "pressure": 1019.68,
-        "altitude": 305.93
-    },
-    {
-        "temperature": 23.74,
-        "pressure": 1020.29,
-        "altitude": 159.07
-    },
-    {
-        "temperature": 29.77,
-        "pressure": 1003.91,
-        "altitude": 421.73
-    },
-    {
-        "temperature": 19.86,
-        "pressure": 989.67,
-        "altitude": 858.39
-    },
-    {
-        "temperature": 17.39,
-        "pressure": 1020.18,
-        "altitude": 758.47
-    },
-    {
-        "temperature": 29.0,
-        "pressure": 1029.09,
-        "altitude": 415.02
-    },
-    {
-        "temperature": 27.98,
-        "pressure": 1022.25,
-        "altitude": 378.78
-    },
-    {
-        "temperature": 25.7,
-        "pressure": 1004.24,
-        "altitude": 484.25
-    },
-    {
-        "temperature": 14.89,
-        "pressure": 998.36,
-        "altitude": 485.92
-    },
-    {
-        "temperature": 11.3,
-        "pressure": 1019.24,
-        "altitude": 305.14
-    },
-    {
-        "temperature": 13.36,
-        "pressure": 1001.92,
-        "altitude": 960.42
-    },
-    {
-        "temperature": 26.93,
-        "pressure": 1016.05,
-        "altitude": 369.48
-    },
-    {
-        "temperature": 26.58,
-        "pressure": 1028.47,
-        "altitude": 683.77
-    },
-    {
-        "temperature": 26.95,
-        "pressure": 1001.96,
-        "altitude": 370.65
-    },
-    {
-        "temperature": 11.97,
-        "pressure": 984.41,
-        "altitude": 403.09
-    },
-    {
-        "temperature": 17.9,
-        "pressure": 989.04,
-        "altitude": 413.81
-    },
-    {
-        "temperature": 18.1,
-        "pressure": 982.4,
-        "altitude": 795.23
-    },
-    {
-        "temperature": 12.98,
-        "pressure": 1021.63,
-        "altitude": 351.92
-    },
-    {
-        "temperature": 28.59,
-        "pressure": 1022.82,
-        "altitude": 328.35
-    },
-    {
-        "temperature": 10.3,
-        "pressure": 980.8,
-        "altitude": 636.58
-    },
-    {
-        "temperature": 12.89,
-        "pressure": 1009.49,
-        "altitude": 403.51
-    },
-    {
-        "temperature": 27.07,
-        "pressure": 1020.52,
-        "altitude": 48.45
-    },
-    {
-        "temperature": 20.53,
-        "pressure": 1026.85,
-        "altitude": 119.62
-    },
-    {
-        "temperature": 10.66,
-        "pressure": 989.03,
-        "altitude": 357.87
-    },
-    {
-        "temperature": 16.95,
-        "pressure": 998.68,
-        "altitude": 85.04
-    },
-    {
-        "temperature": 21.51,
-        "pressure": 992.84,
-        "altitude": 605.87
-    },
-    {
-        "temperature": 18.76,
-        "pressure": 1023.95,
-        "altitude": 562.27
-    },
-    {
-        "temperature": 15.36,
-        "pressure": 994.06,
-        "altitude": 702.5
-    },
-    {
-        "temperature": 21.76,
-        "pressure": 991.71,
-        "altitude": 324.65
-    },
-    {
-        "temperature": 28.76,
-        "pressure": 1026.18,
-        "altitude": 693.42
-    },
-    {
-        "temperature": 23.49,
-        "pressure": 1021.58,
-        "altitude": 177.66
-    },
-    {
-        "temperature": 28.24,
-        "pressure": 1022.02,
-        "altitude": 3.63
-    },
-    {
-        "temperature": 18.15,
-        "pressure": 1010.01,
-        "altitude": 586.96
-    },
-    {
-        "temperature": 18.75,
-        "pressure": 1018.13,
-        "altitude": 87.79
-    },
-    {
-        "temperature": 12.22,
-        "pressure": 995.54,
-        "altitude": 283.02
-    },
-    {
-        "temperature": 10.44,
-        "pressure": 1025.46,
-        "altitude": 193.63
-    },
-    {
-        "temperature": 10.05,
-        "pressure": 981.42,
-        "altitude": 760.25
-    },
-    {
-        "temperature": 25.74,
-        "pressure": 1026.43,
-        "altitude": 882.2
-    },
-    {
-        "temperature": 14.03,
-        "pressure": 984.57,
-        "altitude": 392.57
-    },
-    {
-        "temperature": 15.7,
-        "pressure": 1019.53,
-        "altitude": 306.47
-    },
-    {
-        "temperature": 25.75,
-        "pressure": 1000.8,
-        "altitude": 905.11
-    },
-    {
-        "temperature": 22.96,
-        "pressure": 1010.69,
-        "altitude": 274.75
-    },
-    {
-        "temperature": 19.99,
-        "pressure": 1017.89,
-        "altitude": 37.77
-    },
-    {
-        "temperature": 29.67,
-        "pressure": 1015.82,
-        "altitude": 884.99
-    },
-    {
-        "temperature": 15.79,
-        "pressure": 993.77,
-        "altitude": 905.7
-    },
-    {
-        "temperature": 14.47,
-        "pressure": 988.94,
-        "altitude": 620.97
-    },
-    {
-        "temperature": 12.94,
-        "pressure": 997.43,
-        "altitude": 731.59
-    },
-    {
-        "temperature": 29.31,
-        "pressure": 998.68,
-        "altitude": 176.73
-    },
-    {
-        "temperature": 22.46,
-        "pressure": 987.38,
-        "altitude": 951.43
-    },
-    {
-        "temperature": 29.64,
-        "pressure": 1014.71,
-        "altitude": 558.08
-    },
-    {
-        "temperature": 26.23,
-        "pressure": 994.72,
-        "altitude": 328.02
-    },
-    {
-        "temperature": 25.81,
-        "pressure": 1020.19,
-        "altitude": 155.01
-    },
-    {
-        "temperature": 12.34,
-        "pressure": 1001.33,
-        "altitude": 360.79
-    },
-    {
-        "temperature": 26.97,
-        "pressure": 991.48,
-        "altitude": 197.35
-    },
-    {
-        "temperature": 12.77,
-        "pressure": 1020.16,
-        "altitude": 320.77
-    },
-    {
-        "temperature": 10.45,
-        "pressure": 1007.95,
-        "altitude": 845.07
-    },
-    {
-        "temperature": 20.15,
-        "pressure": 1001.64,
-        "altitude": 359.38
+        "timestamp": 18,
+        "temperature": 30.36,
+        "pressure": 903.18,
+        "altitude": 959.55,
+        "ax": -3464,
+        "ay": -10420,
+        "az": -12912,
+        "gx": -163,
+        "gy": 5,
+        "gz": 90,
+        "uvValue": 1023,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 19,
+        "temperature": 30.37,
+        "pressure": 903.17,
+        "altitude": 959.69,
+        "ax": -3500,
+        "ay": -10432,
+        "az": -12912,
+        "gx": -175,
+        "gy": 58,
+        "gz": -13,
+        "uvValue": 1021,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 20,
+        "temperature": 30.36,
+        "pressure": 903.2,
+        "altitude": 959.39,
+        "ax": -3552,
+        "ay": -10208,
+        "az": -12796,
+        "gx": -164,
+        "gy": 54,
+        "gz": -16,
+        "uvValue": 1040,
+        "uvVoltage": 0.84
+    },
+    {
+        "timestamp": 21,
+        "temperature": 30.36,
+        "pressure": 903.16,
+        "altitude": 959.77,
+        "ax": -3532,
+        "ay": -10348,
+        "az": -13044,
+        "gx": -116,
+        "gy": 36,
+        "gz": -82,
+        "uvValue": 1018,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 22,
+        "temperature": 30.36,
+        "pressure": 903.15,
+        "altitude": 959.87,
+        "ax": -3496,
+        "ay": -10288,
+        "az": -12960,
+        "gx": -145,
+        "gy": 57,
+        "gz": -143,
+        "uvValue": 1033,
+        "uvVoltage": 0.83
+    },
+    {
+        "timestamp": 23,
+        "temperature": 30.36,
+        "pressure": 903.18,
+        "altitude": 959.58,
+        "ax": -3452,
+        "ay": -10272,
+        "az": -12804,
+        "gx": -107,
+        "gy": 24,
+        "gz": 133,
+        "uvValue": 1033,
+        "uvVoltage": 0.83
+    },
+    {
+        "timestamp": 24,
+        "temperature": 30.36,
+        "pressure": 903.19,
+        "altitude": 959.46,
+        "ax": -3528,
+        "ay": -10300,
+        "az": -12912,
+        "gx": -139,
+        "gy": -25,
+        "gz": 155,
+        "uvValue": 1023,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 25,
+        "temperature": 30.35,
+        "pressure": 903.18,
+        "altitude": 959.61,
+        "ax": -3536,
+        "ay": -10388,
+        "az": -12836,
+        "gx": -168,
+        "gy": 44,
+        "gz": -58,
+        "uvValue": 1017,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 26,
+        "temperature": 30.36,
+        "pressure": 903.19,
+        "altitude": 959.5,
+        "ax": -3488,
+        "ay": -10408,
+        "az": -12768,
+        "gx": -158,
+        "gy": 51,
+        "gz": -37,
+        "uvValue": 1017,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 27,
+        "temperature": 30.36,
+        "pressure": 903.18,
+        "altitude": 959.61,
+        "ax": -3396,
+        "ay": -10412,
+        "az": -12892,
+        "gx": -179,
+        "gy": 52,
+        "gz": -124,
+        "uvValue": 1023,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 28,
+        "temperature": 30.36,
+        "pressure": 903.18,
+        "altitude": 959.53,
+        "ax": -3400,
+        "ay": -10452,
+        "az": -13056,
+        "gx": -80,
+        "gy": 58,
+        "gz": 126,
+        "uvValue": 1034,
+        "uvVoltage": 0.83
+    },
+    {
+        "timestamp": 29,
+        "temperature": 30.36,
+        "pressure": 903.17,
+        "altitude": 959.62,
+        "ax": -3584,
+        "ay": -10336,
+        "az": -12888,
+        "gx": -154,
+        "gy": 43,
+        "gz": -80,
+        "uvValue": 1013,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 30,
+        "temperature": 30.36,
+        "pressure": 903.18,
+        "altitude": 959.53,
+        "ax": -3476,
+        "ay": -10308,
+        "az": -12848,
+        "gx": -177,
+        "gy": 25,
+        "gz": 102,
+        "uvValue": 1021,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 31,
+        "temperature": 30.35,
+        "pressure": 903.19,
+        "altitude": 959.47,
+        "ax": -3488,
+        "ay": -10364,
+        "az": -12868,
+        "gx": -118,
+        "gy": 37,
+        "gz": -37,
+        "uvValue": 1014,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 32,
+        "temperature": 30.36,
+        "pressure": 903.17,
+        "altitude": 959.69,
+        "ax": -3468,
+        "ay": -10324,
+        "az": -12896,
+        "gx": -157,
+        "gy": 70,
+        "gz": -3,
+        "uvValue": 1014,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 33,
+        "temperature": 30.36,
+        "pressure": 903.2,
+        "altitude": 959.35,
+        "ax": -3396,
+        "ay": -10216,
+        "az": -12896,
+        "gx": -213,
+        "gy": 30,
+        "gz": 205,
+        "uvValue": 1019,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 34,
+        "temperature": 30.36,
+        "pressure": 903.2,
+        "altitude": 959.38,
+        "ax": -3488,
+        "ay": -10432,
+        "az": -12872,
+        "gx": -374,
+        "gy": -56,
+        "gz": -200,
+        "uvValue": 1017,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 35,
+        "temperature": 30.36,
+        "pressure": 903.17,
+        "altitude": 959.65,
+        "ax": -3488,
+        "ay": -10476,
+        "az": -12960,
+        "gx": -140,
+        "gy": 236,
+        "gz": 61,
+        "uvValue": 1007,
+        "uvVoltage": 0.81
+    },
+    {
+        "timestamp": 36,
+        "temperature": 30.36,
+        "pressure": 903.19,
+        "altitude": 959.52,
+        "ax": -3352,
+        "ay": -10244,
+        "az": -12912,
+        "gx": -211,
+        "gy": 103,
+        "gz": -25,
+        "uvValue": 1019,
+        "uvVoltage": 0.82
+    },
+    {
+        "timestamp": 37,
+        "temperature": 30.36,
+        "pressure": 903.14,
+        "altitude": 959.92,
+        "ax": -3404,
+        "ay": -10284,
+        "az": -12996,
+        "gx": -185,
+        "gy": 17,
+        "gz": -4,
+        "uvValue": 1008,
+        "uvVoltage": 0.81
     }
 ]

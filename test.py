@@ -1,138 +1,49 @@
 import tkinter as tk
-from tkinter import ttk, PhotoImage
-import os
-import serial
-import serial.tools.list_ports
-import threading
-import time
+from tkinter import PhotoImage, scrolledtext
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import serial
+import threading
+import time
 
-# Definir la ruta a la carpeta 'imagenes'
-ruta_Imagenes = os.path.join(os.path.dirname(__file__), 'imagenes')
-
-# Definir las rutas a las imágenes
-ruta_fondo_main = os.path.join(ruta_Imagenes, 'FondoMain.png')
-ruta_imagen = os.path.join(ruta_Imagenes, 'Main.png')
-
-# Variables globales para almacenar datos
-tiempos = []
+# Variables globales
 temperaturas = []
 presiones = []
 altitudes = []
-start_time = time.time()  # Definir start_time globalmente
-canvas = [None] * 3
-ax = [None] * 3
-fig = [None] * 3
-hilo_lectura = None
+tiempos = []
+start_time = time.time()
+canvas = [None, None, None]
+ax = [None, None, None]
+fig = [None, None, None]
+valor_uv_label = None
+valor_gx_label = None
+valor_gy_label = None
+valor_gz_label = None
+texto_serial = None
 
-#=============================Lectura de puertos COM====================================================#
-def obtener_puertos_com():
-    """Obtiene una lista de puertos COM disponibles."""
-    puertos = serial.tools.list_ports.comports()
-    lista_puertos = [puerto.device for puerto in puertos]
-    if not lista_puertos:
-        lista_puertos = ["No se encontraron puertos COM"]
-    return lista_puertos
+# Ruta de la imagen de fondo
+ruta_fondo_main = "Imagenes/FondoMain.png"
 
-#=======================================Actualizar si se Desconecta======================================#
-def actualizar_puertos():
-    """Actualiza la lista de puertos COM en el Combobox."""
-    puertos_disponibles = obtener_puertos_com()
-    combo_puertos['values'] = puertos_disponibles
-    if combo_puertos.get() not in puertos_disponibles:
-        combo_puertos.set("")
-
-    # Volver a ejecutar la función después de 500 ms 
-    root.after(500, actualizar_puertos)
-
-#======================================Lee Datos en el Puerto COM==========================================#
-def leer_datos_com(puerto_com, velocidad_baudios):
-    """Lee datos del puerto COM en un hilo separado."""
-    global hilo_lectura
-    try:
-        with serial.Serial(puerto_com, velocidad_baudios, timeout=1) as ser: # "timeout=1" reset cada 1 segundo
-            while True:
-                if ser.in_waiting > 0:
-                    datos = ser.readline().decode('utf-8').strip()
-                    # Suponiendo que los datos vienen en el formato "temperatura,presion,altitud,timestamp"
-                    try:
-                        temperatura, presion, altitud, timestamp = datos.split(',')
-                        tiempo_actual = time.time() - start_time
-                        temperaturas.append(float(temperatura))
-                        presiones.append(float(presion))
-                        altitudes.append(float(altitud))
-                        tiempos.append(tiempo_actual)
-                        # Limita el tamaño de las listas para evitar sobrecargar la memoria
-                        if len(tiempos) > 100:
-                            tiempos.pop(0)
-                            temperaturas.pop(0)
-                            presiones.pop(0)
-                            altitudes.pop(0)
-                        # Actualiza las gráficas
-                        root.after(0, actualizar_graficas)
-                    except ValueError:
-                        root.after(0, actualizar_mensaje, "Error: Datos no válidos recibidos.")
-                time.sleep(0.1)
-    except serial.SerialException as e:
-        if "Access is denied" in str(e):
-            root.after(0, actualizar_mensaje, "Error: Acceso denegado. Verifica que el puerto COM no esté en uso.")
-        else:
-            root.after(0, actualizar_mensaje, f"Error en la conexión serial: {e}")
-    except Exception as e:
-        root.after(0, actualizar_mensaje, f"Error inesperado: {e}")
-
-def actualizar_mensaje(mensaje_texto):
-    """Actualiza el mensaje en la interfaz gráfica."""
-    mensaje.config(text=mensaje_texto)
+def actualizar_mensaje(mensaje):
+    """Actualiza la etiqueta de mensaje en la interfaz."""
+    mensaje_label.config(text=mensaje)
 
 def actualizar_graficas():
-    """Actualiza todas las gráficas en tiempo real."""
-    global ax, canvas, fig
-    for i in range(3):
-        if ax[i] is not None and fig[i] is not None:
-            ax[i].clear()
-    # Actualiza la gráfica de temperatura
-    if ax[0] is not None and fig[0] is not None:
-        ax[0].plot(tiempos, temperaturas, label='Temperatura vs Tiempo', color='blue')
-        ax[0].set_xlabel('Tiempo (s)')
-        ax[0].set_ylabel('Temperatura (°C)')
-        ax[0].legend()
-
-    # Actualiza la gráfica de presión atmosférica
-    if ax[1] is not None and fig[1] is not None:
-        ax[1].plot(tiempos, presiones, label='Presión vs Tiempo', color='green')
-        ax[1].set_xlabel('Tiempo (s)')
-        ax[1].set_ylabel('Presión (hPa)')
-        ax[1].legend()
-
-    # Actualiza la gráfica de altitud
-    if ax[2] is not None and fig[2] is not None:
-        ax[2].plot(tiempos, altitudes, label='Altitud vs Tiempo', color='red')
-        ax[2].set_xlabel('Tiempo (s)')
-        ax[2].set_ylabel('Altitud (m)')
-        ax[2].legend()
-    
-    for i in range(3):
-        if canvas[i] is not None:
-            canvas[i].draw()
-
-def iniciar_lectura():
-    """Inicia el proceso de lectura de datos y cambia a una nueva interfaz."""
-    puerto_seleccionado = combo_puertos.get()
-    if puerto_seleccionado != "No se encontraron puertos COM" and puerto_seleccionado:
-        # Inicia un nuevo hilo para leer datos del puerto COM
-        global hilo_lectura
-        if hilo_lectura is not None and hilo_lectura.is_alive():
-            hilo_lectura.join()
-        hilo_lectura = threading.Thread(target=leer_datos_com, args=(puerto_seleccionado, 115200))
-        hilo_lectura.daemon = True  # Termina el hilo cuando se cierra la ventana
-        hilo_lectura.start()
-        # Oculta la ventana actual y muestra la nueva interfaz
-        root.withdraw()
-        mostrar_nueva_interfaz()
-    else:
-        actualizar_mensaje("Por favor, selecciona un puerto COM válido.")
+    """Actualiza las gráficas en la interfaz."""
+    for i, ax_i in enumerate(ax):
+        ax_i.clear()
+        if i == 0:
+            ax_i.plot(tiempos, temperaturas, label="Temperatura (°C)", color='r')
+        elif i == 1:
+            ax_i.plot(tiempos, presiones, label="Presión (hPa)", color='b')
+        elif i == 2:
+            ax_i.plot(tiempos, altitudes, label="Altitud (m)", color='g')
+        ax_i.legend()
+        ax_i.set_xlabel("Tiempo (s)")
+        ax_i.set_ylabel(["Temperatura (°C)", "Presión (hPa)", "Altitud (m)"][i])
+        ax_i.set_title(["Temperatura vs Tiempo", "Presión vs Tiempo", "Altitud vs Tiempo"][i])
+        canvas[i].draw()
 
 def mostrar_nueva_interfaz():
     """Crea y muestra la nueva interfaz con 3 cuadros en una línea recta, centrados y con tamaño fijo."""
@@ -168,84 +79,123 @@ def mostrar_nueva_interfaz():
         canvas_widget.config(width=360, height=360)  # Tamaño fijo de 360x360 píxeles
         canvas_widget.grid(row=0, column=i, padx=5, pady=5)
 
+    # Crear un marco para mostrar los valores UV y giroscopio
+    marco_datos = tk.Frame(nueva_ventana, bg='lightgray')
+    marco_datos.pack(side='right', padx=10, pady=10, fill='y')
+
+    # Labels para mostrar los valores de UV y giroscopio
+    global valor_uv_label, valor_gx_label, valor_gy_label, valor_gz_label
+    tk.Label(marco_datos, text="UV Sensor Value:", font=("Helvetica", 12), bg='lightgray').pack(pady=5)
+    valor_uv_label = tk.Label(marco_datos, text="0", font=("Helvetica", 12), bg='white')
+    valor_uv_label.pack(pady=5)
+
+    tk.Label(marco_datos, text="Gyroscope Values:", font=("Helvetica", 12), bg='lightgray').pack(pady=5)
+    valor_gx_label = tk.Label(marco_datos, text="Gx: 0", font=("Helvetica", 12), bg='white')
+    valor_gx_label.pack(pady=5)
+    valor_gy_label = tk.Label(marco_datos, text="Gy: 0", font=("Helvetica", 12), bg='white')
+    valor_gy_label.pack(pady=5)
+    valor_gz_label = tk.Label(marco_datos, text="Gz: 0", font=("Helvetica", 12), bg='white')
+    valor_gz_label.pack(pady=5)
+
+    # Crear un marco para el área de texto de los datos del puerto COM
+    marco_texto = tk.Frame(nueva_ventana)
+    marco_texto.pack(side='left', padx=10, pady=10, fill='both', expand=True)
+
+    # Área de texto para visualizar los datos del puerto COM
+    global texto_serial
+    texto_serial = scrolledtext.ScrolledText(marco_texto, width=60, height=20, wrap=tk.WORD)
+    texto_serial.pack(padx=5, pady=5, fill='both', expand=True)
+
     # Crear un marco para el botón de cerrar
     marco_boton = tk.Frame(nueva_ventana, bg='blue')
     marco_boton.pack(side='bottom', anchor='w', padx=20, pady=20)
 
     # Botón para cerrar la nueva ventana
-    cerrar_boton = tk.Button(marco_boton, text="Cerrar", command=nueva_ventana.destroy)
-    cerrar_boton.pack()
+    tk.Button(marco_boton, text="Cerrar", command=nueva_ventana.destroy).pack()
 
     # Ajustar la cuadrícula del contenedor para que mantenga el tamaño y posición de los gráficos
     contenedor.update_idletasks()
-    ancho_contenedor = contenedor.winfo_width()
     contenedor.grid_columnconfigure(0, weight=1)
     contenedor.grid_columnconfigure(1, weight=1)
     contenedor.grid_columnconfigure(2, weight=1)
 
-def actualizar_estado_boton():
-    """Actualiza el estado del botón 'OK' según la selección del puerto COM."""
-    if combo_puertos.get() == "No se encontraron puertos COM" or not combo_puertos.get():
-        boton_ok.config(state=tk.DISABLED)
-    else:
-        boton_ok.config(state=tk.NORMAL)
+def leer_datos_com(puerto_com, velocidad_baudios):
+    """Lee datos del puerto COM en un hilo separado."""
+    global hilo_lectura
+    try:
+        with serial.Serial(puerto_com, velocidad_baudios, timeout=1) as ser:  # "timeout=1" reset cada 1 segundo
+            while True:
+                if ser.in_waiting > 0:
+                    datos = ser.readline().decode('utf-8').strip()
+                    try:
+                        temperatura, presion, altitud, gx, gy, gz, uvValue, uvVoltage, timestamp = datos.split(',')
+                        tiempo_actual = time.time() - start_time
+                        temperaturas.append(float(temperatura))
+                        presiones.append(float(presion))
+                        altitudes.append(float(altitud))
+                        tiempos.append(tiempo_actual)
 
-# Crear la ventana principal
+                        # Actualiza las labels con los nuevos valores
+                        root.after(0, lambda: valor_uv_label.config(text=f"{uvValue} V ({uvVoltage} V)"))
+                        root.after(0, lambda: valor_gx_label.config(text=f"Gx: {gx}"))
+                        root.after(0, lambda: valor_gy_label.config(text=f"Gy: {gy}"))
+                        root.after(0, lambda: valor_gz_label.config(text=f"Gz: {gz}"))
+
+                        # Limita el tamaño de las listas para evitar sobrecargar la memoria
+                        if len(tiempos) > 100:
+                            tiempos.pop(0)
+                            temperaturas.pop(0)
+                            presiones.pop(0)
+                            altitudes.pop(0)
+
+                        # Actualiza las gráficas
+                        root.after(0, actualizar_graficas)
+
+                        # Muestra los datos en el área de texto
+                        texto_serial.insert(tk.END, f"{datos}\n")
+                        texto_serial.yview(tk.END)  # Desplaza hacia abajo para mostrar el nuevo texto
+
+                    except ValueError:
+                        root.after(0, actualizar_mensaje, "Error: Datos no válidos recibidos.")
+                time.sleep(0.1)
+    except serial.SerialException as e:
+        if "Access is denied" in str(e):
+            root.after(0, actualizar_mensaje, "Error: Acceso denegado. Verifica que el puerto COM no esté en uso.")
+        else:
+            root.after(0, actualizar_mensaje, f"Error en la conexión serial: {e}")
+    except Exception as e:
+        root.after(0, actualizar_mensaje, f"Error inesperado: {e}")
+
+def iniciar_lectura_datos():
+    """Inicia el hilo para leer datos del puerto COM."""
+    puerto_com = entrada_puerto_com.get()
+    velocidad_baudios = int(entrada_baudios.get())
+    hilo_lectura = threading.Thread(target=leer_datos_com, args=(puerto_com, velocidad_baudios), daemon=True)
+    hilo_lectura.start()
+    mostrar_nueva_interfaz()
+
+# Configuración inicial de la interfaz
 root = tk.Tk()
-root.title("PROYECTO CANSAT")
+root.title("Interfaz CANSAT")
 
-# Obtener tamaño de pantalla
-pantalla_ancho = root.winfo_screenwidth()
-pantalla_alto = root.winfo_screenheight()
+# Crear el marco para las entradas y botones
+marco_entrada = tk.Frame(root)
+marco_entrada.pack(padx=10, pady=10)
 
-# Ajustar tamaño de la ventana principal para que ocupe toda la pantalla
-root.geometry(f"{pantalla_ancho}x{pantalla_alto}")
+# Crear etiquetas y entradas para el puerto COM y la velocidad de baudios
+tk.Label(marco_entrada, text="Puerto COM:").grid(row=0, column=0, padx=5, pady=5)
+entrada_puerto_com = tk.Entry(marco_entrada)
+entrada_puerto_com.grid(row=0, column=1, padx=5, pady=5)
 
-# Crear un Label para la imagen de fondo
-try:
-    fondo_imagen = PhotoImage(file=ruta_fondo_main)
-    fondo_label = tk.Label(root, image=fondo_imagen)
-    fondo_label.place(relwidth=1, relheight=1)
-except Exception as e:
-    print(f"Error al cargar la imagen de fondo: {e}")
+tk.Label(marco_entrada, text="Velocidad de Baudios:").grid(row=1, column=0, padx=5, pady=5)
+entrada_baudios = tk.Entry(marco_entrada)
+entrada_baudios.grid(row=1, column=1, padx=5, pady=5)
 
-# Crear un marco para contener la imagen y el selector
-marco_contenedor = tk.Frame(root, bg='#04111d')
-marco_contenedor.place(relx=0.5, rely=0.40, anchor='center')
+# Crear un botón para iniciar la lectura de datos
+tk.Button(marco_entrada, text="Iniciar", command=iniciar_lectura_datos).grid(row=2, columnspan=2, pady=10)
 
-# Cargar y mostrar la imagen
-try:
-    imagen = PhotoImage(file=ruta_imagen)
-    label_imagen = tk.Label(marco_contenedor, image=imagen, bg='#153553')
-    label_imagen.pack(pady=5)
-except Exception as e:
-    print(f"Error al cargar la imagen principal: {e}")
+# Crear una etiqueta para mostrar mensajes de estado
+mensaje_label = tk.Label(root, text="")
+mensaje_label.pack(pady=10)
 
-# Crear un marco para el texto, el selector y el botón OK
-marco_selector = tk.Frame(marco_contenedor, bg='#153553')
-marco_selector.pack(pady=0.02)
-
-# Crear el widget Label para la instrucción
-label = tk.Label(marco_selector, text="Seleccionar puerto COM", font=("Helvetica", 14), bg='#153553')
-label.pack(pady=3)
-
-# Crear y colocar el widget Combobox dentro del marco
-combo_puertos = ttk.Combobox(marco_selector, state='readonly')
-combo_puertos.pack(pady=2)
-
-# Crear y colocar el botón "OK" dentro del marco (mantener siempre la misma distancia del Combobox)
-boton_ok = tk.Button(marco_selector, text="Conectar", command=iniciar_lectura, state=tk.DISABLED)
-boton_ok.pack(pady=5)
-
-# Crear y colocar el widget Label para mostrar el mensaje
-mensaje = tk.Label(root, text="", bg='#153553')
-mensaje.pack(pady=10)
-
-# Actualizar el estado del botón "OK" al cambiar la selección del Combobox
-combo_puertos.bind("<<ComboboxSelected>>", lambda event: actualizar_estado_boton())
-
-# Iniciar la actualización periódica de puertos COM
-actualizar_puertos()
-
-# Ejecutar el bucle principal de la aplicación
 root.mainloop()
