@@ -1,10 +1,12 @@
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
-import subprocess
+import sys
 import os
+import subprocess
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFrame
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap, QIcon
+from PIL import Image
 
-# Variables globales para mantener las referencias a los procesos
+# Variables globales para los procesos
 processes = []
 status_file = 'status.txt'
 
@@ -25,20 +27,15 @@ def start_scripts():
     
     # Actualizar el archivo de estado
     update_status(1)
-    
-    # Cerrar la ventana actual
-    root.destroy()
 
 def on_closing():
     global processes
     for proc in processes:
-        proc.terminate()  # Terminar el proceso
-        proc.wait()       # Esperar a que el proceso termine
+        proc.terminate()  # Terminar los procesos
+        proc.wait()       # Esperar a que terminen
     
     # Actualizar el archivo de estado
     update_status(0)
-    
-    root.destroy()
 
 def resize_image(image, max_width, max_height):
     """Redimensiona la imagen manteniendo su proporción."""
@@ -54,68 +51,75 @@ def resize_image(image, max_width, max_height):
     
     return image.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        
+        self.setWindowTitle("Iniciar Scripts")
+        self.setGeometry(100, 100, 800, 600)  # Puedes ajustar el tamaño según sea necesario
+        self.setWindowState(Qt.WindowMaximized)  # Ventana en pantalla completa
+
+        # Crear un contenedor principal
+        main_widget = QWidget(self)
+        self.setCentralWidget(main_widget)
+
+        # Layout para la ventana
+        layout = QVBoxLayout(main_widget)
+        layout.setAlignment(Qt.AlignCenter)  # Centrar el contenido
+
+        # Imagen de fondo
+        try:
+            image_path = os.path.join(os.getcwd(), 'Imagenes', 'FondoMain.png')
+            imagen = Image.open(image_path)
+            imagen = resize_image(imagen, self.width(), self.height())
+            imagen.save('resized_image.png')  # Guardar la imagen redimensionada temporalmente
+            fondo_pixmap = QPixmap('resized_image.png')
+
+            fondo_label = QLabel(self)
+            fondo_label.setPixmap(fondo_pixmap)
+            fondo_label.setScaledContents(True)
+            fondo_label.setGeometry(0, 0, self.width(), self.height())  # Asegurar que la imagen cubra toda la ventana
+            fondo_label.lower()  # Enviar el fondo al nivel más bajo
+        except Exception as e:
+            print(f"Error al cargar la imagen de fondo: {e}")
+
+        # Frame para el botón
+        button_frame = QFrame(self)
+        button_frame.setFixedSize(360, 360)
+        button_frame.setStyleSheet("background-color: #153553; border-radius: 10px;")
+        layout.addWidget(button_frame, alignment=Qt.AlignCenter)
+
+        # Imagen del título en el frame
+        try:
+            title_image_path = os.path.join(os.getcwd(), 'Imagenes', 'Main.png')
+            title_image = Image.open(title_image_path)
+            title_image = resize_image(title_image, 360, 100)
+            title_image.save('resized_title.png')  # Guardar la imagen redimensionada temporalmente
+            title_pixmap = QPixmap('resized_title.png')
+
+            title_label = QLabel(button_frame)
+            title_label.setPixmap(title_pixmap)
+            title_label.setAlignment(Qt.AlignCenter)
+            title_label.setStyleSheet("background-color: #153553;")
+            title_label.move(80, 50)
+        except Exception as e:
+            print(f"Error al cargar la imagen del título: {e}")
+
+        # Botón para iniciar los scripts
+        button = QPushButton("Iniciar", button_frame)
+        button.setFixedSize(200, 100)
+        button.move(80, 200)  # Centrar el botón dentro del frame
+        button.clicked.connect(start_scripts)  # Conectar el botón con la función de iniciar scripts
+
+    def closeEvent(self, event):
+        on_closing()  # Llamar a la función para terminar procesos al cerrar
+        event.accept()  # Aceptar el cierre
+
 def main():
-    global root
-    # Crear la ventana principal
-    root = tk.Tk()
-    root.title("Iniciar Scripts")
-
-    # Configurar la ventana para que use el tamaño completo de la pantalla
-    root.state('zoomed')
-
-    # Crear un contenedor para la imagen de fondo
-    fondo_frame = tk.Frame(root)
-    fondo_frame.place(relwidth=1, relheight=1)
-
-    # Cargar la imagen de fondo
-    try:
-        # Ruta de la imagen de fondo
-        image_path = os.path.join(os.getcwd(), 'Imagenes', 'FondoMain.png')
-        
-        # Abrir la imagen y redimensionarla para ajustarse al tamaño de la ventana manteniendo su proporción
-        imagen = Image.open(image_path)
-        imagen = resize_image(imagen, root.winfo_screenwidth(), root.winfo_screenheight())
-        imagen_tk = ImageTk.PhotoImage(imagen)
-        
-        # Crear un Label para mostrar la imagen de fondo
-        fondo_label = tk.Label(fondo_frame, image=imagen_tk)
-        fondo_label.place(relwidth=1, relheight=1)
-        fondo_label.image = imagen_tk  # Mantener una referencia a la imagen
-    except Exception as e:
-        print(f"Error al cargar la imagen de fondo: {e}")
-
-    # Crear un Frame para el botón con tamaño fijo
-    button_frame = tk.Frame(root, width=360, height=360, bg='#153553')
-    button_frame.place(relx=0.5, rely=0.5, anchor='center')  # Centrar el frame en la ventana
-
-    # Cargar la imagen del título
-    try:
-        # Ruta de la imagen del título
-        title_image_path = os.path.join(os.getcwd(), 'Imagenes', 'Main.png')
-        title_image = Image.open(title_image_path)
-        title_image = resize_image(title_image, 360, 100)  # Ajustar el tamaño según sea necesario
-        title_image_tk = ImageTk.PhotoImage(title_image)
-        
-        # Crear un Label para mostrar la imagen del título
-        title_label = tk.Label(button_frame, image=title_image_tk, bg='#153553')
-        title_label.pack(pady=(0, 10))  # Espacio entre la imagen del título y el botón
-        title_label.image = title_image_tk  # Mantener una referencia a la imagen
-    except Exception as e:
-        print(f"Error al cargar la imagen del título: {e}")
-
-    # Crear un estilo ttk
-    style = ttk.Style()
-    style.configure('TCenter', font=('Helvetica', 20))
-
-    # Crear un botón para iniciar los scripts
-    button = ttk.Button(button_frame, text="Iniciar", command=start_scripts)
-    button.pack(expand=True, pady=20)  # Expandir y añadir un margen de 20 píxeles en el eje Y
-
-    # Configurar el manejador para el cierre de la ventana
-    root.protocol("WM_DELETE_WINDOW", on_closing)
-
-    # Ejecutar el bucle principal de la aplicación
-    root.mainloop()
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
