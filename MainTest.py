@@ -1,125 +1,68 @@
 import sys
-import os
 import subprocess
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFrame
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QIcon
-from PIL import Image
-
-# Variables globales para los procesos
-processes = []
-status_file = 'status.txt'
-
-def update_status(value):
-    """Actualiza el archivo de estado con el valor dado (0 o 1)."""
-    with open(status_file, 'w') as f:
-        f.write(str(value))
-
-def start_scripts():
-    global processes
-    # Rutas a los archivos scripts
-    script1_path = os.path.join(os.getcwd(), 'serialtest.py')
-    script2_path = os.path.join(os.getcwd(), 'testwindows(true).py')
-    
-    # Ejecutar ambos scripts en nuevos procesos
-    processes.append(subprocess.Popen(['python', script1_path]))
-    processes.append(subprocess.Popen(['python', script2_path]))
-    
-    # Actualizar el archivo de estado
-    update_status(1)
-
-def on_closing():
-    global processes
-    for proc in processes:
-        proc.terminate()  # Terminar los procesos
-        proc.wait()       # Esperar a que terminen
-    
-    # Actualizar el archivo de estado
-    update_status(0)
-
-def resize_image(image, max_width, max_height):
-    """Redimensiona la imagen manteniendo su proporción."""
-    width, height = image.size
-    aspect_ratio = width / height
-    
-    if width > height:
-        new_width = min(max_width, width)
-        new_height = int(new_width / aspect_ratio)
-    else:
-        new_height = min(max_height, height)
-        new_width = int(new_height * aspect_ratio)
-    
-    return image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+import json
+import os
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        
-        self.setWindowTitle("Iniciar Scripts")
-        self.setGeometry(100, 100, 800, 600)  # Puedes ajustar el tamaño según sea necesario
-        self.setWindowState(Qt.WindowMaximized)  # Ventana en pantalla completa
+        self.setWindowTitle('Main Window')
 
-        # Crear un contenedor principal
-        main_widget = QWidget(self)
-        self.setCentralWidget(main_widget)
+        # Configurar el tamaño y el layout de la ventana
+        self.setGeometry(100, 100, 800, 600)
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
 
-        # Layout para la ventana
-        layout = QVBoxLayout(main_widget)
-        layout.setAlignment(Qt.AlignCenter)  # Centrar el contenido
+        # Botón para abrir las ventanas de gráficos y serial
+        open_graphics_and_serial_button = QPushButton('Iniciar Gráficas y Serial')
+        open_graphics_and_serial_button.clicked.connect(self.open_graphics_and_serial)
+        layout.addWidget(open_graphics_and_serial_button)
 
-        # Imagen de fondo
+    def open_graphics_and_serial(self):
+        # Ejecutar graficas.py
+        subprocess.Popen(['python', 'graficas.py'])
+
+        # Ejecutar serialtest.py
+        subprocess.Popen(['python', 'datosg.py'])
+
+        # Actualizar el archivo estados.json
+        self.update_status_file()
+
+        # Cerrar la ventana principal
+        self.close()
+
+    def update_status_file(self):
+        estados_path = 'Estados/estados.json'
+        # Verificar si el archivo existe
+        if not os.path.exists(estados_path):
+            # Crear el archivo con valores iniciales si no existe
+            with open(estados_path, 'w') as file:
+                json.dump([{"run": 0, "serial": 0, "graficas": 0}], file)
+
         try:
-            image_path = os.path.join(os.getcwd(), 'Imagenes', 'FondoMain.png')
-            imagen = Image.open(image_path)
-            imagen = resize_image(imagen, self.width(), self.height())
-            imagen.save('resized_image.png')  # Guardar la imagen redimensionada temporalmente
-            fondo_pixmap = QPixmap('resized_image.png')
+            with open(estados_path, 'r+') as file:
+                # Leer los datos actuales
+                data = json.load(file)
 
-            fondo_label = QLabel(self)
-            fondo_label.setPixmap(fondo_pixmap)
-            fondo_label.setScaledContents(True)
-            fondo_label.setGeometry(0, 0, self.width(), self.height())  # Asegurar que la imagen cubra toda la ventana
-            fondo_label.lower()  # Enviar el fondo al nivel más bajo
-        except Exception as e:
-            print(f"Error al cargar la imagen de fondo: {e}")
+                if isinstance(data, list) and len(data) > 0:
+                    # Modificar los valores
+                    data[0]['run'] = 1
+                    data[0]['serial'] = 1
+                    data[0]['graficas'] = 1
 
-        # Frame para el botón
-        button_frame = QFrame(self)
-        button_frame.setFixedSize(360, 360)
-        button_frame.setStyleSheet("background-color: #153553; border-radius: 10px;")
-        layout.addWidget(button_frame, alignment=Qt.AlignCenter)
+                    # Volver al principio del archivo para sobrescribir
+                    file.seek(0)
+                    json.dump(data, file)
+                    file.truncate()  # Eliminar cualquier dato restante después del nuevo contenido
+                else:
+                    raise ValueError("El archivo estados.json no contiene una lista válida o está vacío.")
+        except (ValueError, json.JSONDecodeError) as e:
+            print(f"Error al leer o escribir el archivo estados.json: {e}")
 
-        # Imagen del título en el frame
-        try:
-            title_image_path = os.path.join(os.getcwd(), 'Imagenes', 'Main.png')
-            title_image = Image.open(title_image_path)
-            title_image = resize_image(title_image, 360, 100)
-            title_image.save('resized_title.png')  # Guardar la imagen redimensionada temporalmente
-            title_pixmap = QPixmap('resized_title.png')
-
-            title_label = QLabel(button_frame)
-            title_label.setPixmap(title_pixmap)
-            title_label.setAlignment(Qt.AlignCenter)
-            title_label.setStyleSheet("background-color: #153553;")
-            title_label.move(80, 50)
-        except Exception as e:
-            print(f"Error al cargar la imagen del título: {e}")
-
-        # Botón para iniciar los scripts
-        button = QPushButton("Iniciar", button_frame)
-        button.setFixedSize(200, 100)
-        button.move(80, 200)  # Centrar el botón dentro del frame
-        button.clicked.connect(start_scripts)  # Conectar el botón con la función de iniciar scripts
-
-    def closeEvent(self, event):
-        on_closing()  # Llamar a la función para terminar procesos al cerrar
-        event.accept()  # Aceptar el cierre
-
-def main():
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
