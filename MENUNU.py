@@ -2,9 +2,9 @@ import sys
 import subprocess
 import json
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QFrame, QLabel, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel, QSizePolicy, QFrame
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QPainter, QPalette, QBrush
+from PyQt5.QtGui import QPixmap, QPainter, QIcon
 
 class BackgroundWidget(QWidget):
     def __init__(self, image_path, *args, **kwargs):
@@ -28,12 +28,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle('Main Window')
 
-        # Flag para controlar la actualización del JSON
-        self.update_json_on_close = False
-
         # Configurar el tamaño y el layout de la ventana
         self.setGeometry(100, 100, 800, 600)
-
+        
         # Crear un widget personalizado para el fondo
         self.background_widget = BackgroundWidget('Imagenes/FondoMain.png')
         self.background_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -80,6 +77,14 @@ class MainWindow(QMainWindow):
                 background-color: #D4AF37; /* Verde más oscuro */ 
             } 
         """)
+        
+        # Redimensionar el icono antes de asignarlo al botón
+        icon_pixmap = QPixmap('Imagenes/icono.png')
+        icon_pixmap = icon_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ajustar el tamaño del icono
+        icon = QIcon(icon_pixmap)
+        open_graphics_and_serial_button.setIcon(icon)
+        open_graphics_and_serial_button.setIconSize(icon_pixmap.size())  # Establecer el tamaño del icono
+        
         open_graphics_and_serial_button.clicked.connect(self.open_graphics_and_serial)
         frame_layout.addWidget(open_graphics_and_serial_button)
 
@@ -96,32 +101,28 @@ class MainWindow(QMainWindow):
     def open_graphics_and_serial(self):
         # Ejecutar graficas.py y datosg.py
         try:
-            subprocess.run(['python', 'graficas.py'], check=True)
-            subprocess.run(['python', 'datosg.py'], check=True)
-            self.update_json_on_close = True  # Solo actualizar el JSON si se ejecutaron los scripts correctamente
-        except subprocess.CalledProcessError as e:
+            subprocess.Popen(['python', 'graficas.py'])
+            subprocess.Popen(['python', 'datosg.py'])
+        except Exception as e:
             print(f"Error al ejecutar los scripts: {e}")
-        
+
+        # Actualizar el archivo estados.json
+        self.update_status_file()
+
         # Cerrar la ventana principal
         self.close()
 
-    def closeEvent(self, event):
-        # Actualizar el archivo estados.json solo si el flag está activado
-        if self.update_json_on_close:
-            self.update_status_file()
-        super().closeEvent(event)
-
     def update_status_file(self):
         estados_path = 'Estados/estados.json'
-        
-        # Verificar si el archivo existe y crear si es necesario
+        # Verificar si el archivo existe
         if not os.path.exists(estados_path):
+            # Crear el archivo con valores iniciales si no existe
             with open(estados_path, 'w') as file:
                 json.dump([{"run": 0, "serial": 0, "graficas": 0}], file)
-        
-        # Leer y actualizar el archivo JSON
+
         try:
             with open(estados_path, 'r+') as file:
+                # Leer los datos actuales
                 data = json.load(file)
 
                 if isinstance(data, list) and len(data) > 0:
@@ -130,7 +131,7 @@ class MainWindow(QMainWindow):
                     data[0]['serial'] = 1
                     data[0]['graficas'] = 1
 
-                    # Volver al principio del archivo y sobrescribir
+                    # Volver al principio del archivo para sobrescribir
                     file.seek(0)
                     json.dump(data, file)
                     file.truncate()  # Eliminar cualquier dato restante después del nuevo contenido
@@ -142,5 +143,5 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.showMaximized()
+    window.show()
     sys.exit(app.exec_())
